@@ -12,6 +12,13 @@ namespace DatabaseSchema.DataBaseContext
 {
     public class EmployeeContext : DbContext
     {
+
+     
+        public EmployeeContext(DbContextOptions<EmployeeContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<Employee> Employees { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -24,7 +31,7 @@ namespace DatabaseSchema.DataBaseContext
             emp.ToTable("employees");  
 
            
-            emp.Property(e => e.Id).HasColumnName("employeeid");
+            emp.Property(e => e.Id).HasColumnName("employeeid").ValueGeneratedNever();
             emp.Property(e => e.Name).HasColumnName("employeename");
             emp.Property(e => e.Salary).HasColumnName("employeesalary");
         }

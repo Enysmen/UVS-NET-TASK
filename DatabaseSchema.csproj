@@ -9,12 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />6.0
-	      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Npgsql" Version="6.0.12" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
-    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
-	   <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />	  
+    	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
+    	<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    	<PackageReference Include="Npgsql" Version="6.0.12" />
+    	<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
+    	<PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
+	  <None Update="appsettings.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
 </Project>

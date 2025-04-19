@@ -29,7 +29,7 @@ namespace DatabaseSchema
                 {
                     
                     services.AddDbContext<EmployeeContext>(opts =>
-                        opts.UseNpgsql(ctx.Configuration.GetConnectionString("Default")));
+                        opts.UseNpgsql(ctx.Configuration.GetConnectionString("Default")!));
                     
                     services.AddScoped<IEmployeeRepository, EmployeeRepository>();
                     services.AddScoped<IEmployeeService, EmployeeService>();
@@ -43,21 +43,21 @@ namespace DatabaseSchema
             var root = new RootCommand("UVS Test Console App");
 
             var set = new Command("set-employee", "Add new employee");
-            set.AddOption(new Option<int>("--employeeId") { IsRequired = true });
-            set.AddOption(new Option<string>("--employeeName") { IsRequired = true });
-            set.AddOption(new Option<decimal>("--employeeSalary") { IsRequired = true });
-            set.Handler = CommandHandler.Create<int, string, decimal>(async (id, name, salary) =>
+            set.AddOption(new Option<int>("--employeeId", "Employee ID") { IsRequired = true });
+            set.AddOption(new Option<string>("--employeeName", "Employee Name") { IsRequired = true });
+            set.AddOption(new Option<decimal>("--employeeSalary", "Employee Salary") { IsRequired = true });
+            set.Handler = CommandHandler.Create<int, string, decimal>(async (employeeId, employeeName, employeeSalary) =>
             {
-                await svc.AddEmployeeAsync(id, name, salary);
+                await svc.AddEmployeeAsync(employeeId, employeeName, employeeSalary);
                 Console.WriteLine("Employee added.");
             });
             root.AddCommand(set);
 
             var get = new Command("get-employee", "Get employee by ID");
-            get.AddOption(new Option<int>("--employeeId") { IsRequired = true });
-            get.Handler = CommandHandler.Create<int>(async id =>
+            get.AddOption(new Option<int>("--employeeId", "Employee ID") { IsRequired = true });
+            get.Handler = CommandHandler.Create<int>(async employeeId =>
             {
-                var emp = await svc.GetEmployeeAsync(id);
+                var emp = await svc.GetEmployeeAsync(employeeId);
                 if (emp is null)
                     Console.WriteLine("Employee not found.");
                 else

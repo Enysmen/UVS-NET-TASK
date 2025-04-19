@@ -12,3 +12,4 @@ dotnet run --no-build set-employee --employeeId 2 --employeeName Steve --employe
 dotnet run --no-build get-employee --employeeId 1
 dotnet run --no-build get-employee --employeeId 2
 
+cd ../..
