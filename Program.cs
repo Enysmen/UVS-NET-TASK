@@ -15,6 +15,7 @@ using DatabaseSchema.Model;
 using DatabaseSchema.Services;
 using Microsoft.Extensions.Configuration;
 using DatabaseSchema.Repositories;
+using DatabaseSchema.Infrastructure;
 
 
 namespace DatabaseSchema
@@ -33,14 +34,24 @@ namespace DatabaseSchema
                     
                     services.AddScoped<IEmployeeRepository, EmployeeRepository>();
                     services.AddScoped<IEmployeeService, EmployeeService>();
+                    services.AddScoped<DatabaseInitializer>();
                 })
                 .Build();
 
             
             var svc = host.Services.GetRequiredService<IEmployeeService>();
+            var initializer = host.Services.GetRequiredService<DatabaseInitializer>();
 
-            
             var root = new RootCommand("UVS Test Console App");
+            
+
+            var initDbCmd = new Command("init-db", "Initialize Postgres database and apply schema");
+            initDbCmd.Handler = CommandHandler.Create(async () =>
+            {
+                await initializer.InitializeAsync();
+                Console.WriteLine("Database initialized successfully.");
+            });
+            root.AddCommand(initDbCmd);
 
             var set = new Command("set-employee", "Add new employee");
             set.AddOption(new Option<int>("--employeeId", "Employee ID") { IsRequired = true });
@@ -68,79 +79,10 @@ namespace DatabaseSchema
             
             return await root.InvokeAsync(args);
 
-
-
-
-
-
-
-
-
-
-            
+ 
         }
     }
 }
-
-
-
-
-
-//// 1. Создаём корневую команду
-//var rootCommand = new RootCommand("UVS Test Console Application");
-
-//// 2. Команда set-employee
-//var setCmd = new Command("set-employee", "Add a new employee")
-//{
-//    new Option<int>("--employeeId", "Employee ID") { IsRequired = true },
-//    new Option<string>("--employeeName", "Employee Name") { IsRequired = true },
-//    new Option<decimal>("--employeeSalary", "Employee Salary") { IsRequired = true }
-//};
-//setCmd.Handler = CommandHandler.Create<int, string, decimal>(async (employeeId, employeeName, employeeSalary) =>
-//{
-//    await using var ctx = new EmployeeContext();
-//    var emp = new Employee
-//    {
-//        Id = employeeId,
-//        Name = employeeName,
-//        Salary = employeeSalary
-//    };
-//    ctx.Employees!.Add(emp);
-//    await ctx.SaveChangesAsync();
-//    Console.WriteLine($"Id={emp.Id}, Name={emp.Name}, Salary={emp.Salary}");
-//});
-//rootCommand.AddCommand(setCmd);
-
-//// 3. Команда get-employee
-//var getCmd = new Command("get-employee", "Retrieve an employee by ID")
-//{
-//    new Option<int>("--employeeId", "Employee ID") { IsRequired = true }
-//};
-//getCmd.Handler = CommandHandler.Create<int>(async employeeId =>
-//{
-//    await using var ctx = new EmployeeContext();
-//    var emp = await ctx.Employees!.FindAsync(employeeId);
-//    if (emp is null)
-//        Console.WriteLine("Employee not found");
-//    else
-//        Console.WriteLine($"Id={emp.Id}, Name={emp.Name}, Salary={emp.Salary}");
-//});
-//rootCommand.AddCommand(getCmd);
-
-
-
-
-//// 4. Запускаем парсер
-//return await rootCommand.InvokeAsync(args);
-
-
-
-
-
-
-
-
-
 
 
 
