@@ -22,102 +22,101 @@ C#
 
 &#x20;
 
-Консольное приложение на **.NET 6** для управления данными сотрудников (добавление и получение) в базе данных PostgreSQL с использованием **Entity Framework Core**.
+Console application on **.NET 6** for managing employee data (adding and retrieving) in a PostgreSQL database using **Entity Framework Core**.
 
 ---
 
-## 📋 Оглавление
+## 📋 Table of contents
 
-- [🚀 Требования](#-требования)
-- [🛠 Установка и запуск](#-установка-и-запуск)
-  - [1️⃣ Подготовка БД](#1️⃣-подготовка-бд)
-  - [2️⃣ Конфигурация](#2️⃣-конфигурация)
-  - [3️⃣ Запуск приложения](#3️⃣-запуск-приложения)
-- [🎛 Доступные команды](#-доступные-команды)
-- [✅ Выполнено](#-выполнено)
-- [📝 Лицензия](#-лицензия)
+- [🚀 Requirements](#-requirements)
+- [🛠 Install and run](#-install-and-run)
+- [1️⃣ Preparing the database](#1️⃣-preparing-the-database)
+  - [2️⃣ Configuration](#2️⃣-configuration)
+  - [3️⃣ Launch application](#3️⃣-launch-application)
+- [🎛 Available commands](#-available-commands)
+- [✅ Completed](#-completed)
+
 
 ---
 
-## 🚀 Требования
+## 🚀 Requirements
 
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
-- [Docker](https://www.docker.com/) (для PostgreSQL) или локальный инстанс PostgreSQL
-- PowerShell Core или Windows PowerShell
+- [Docker](https://www.docker.com/) (for PostgreSQL) or a local PostgreSQL instance
+- PowerShell Core or Windows PowerShell
 
 ---
 
-## 🛠 Установка и запуск
+## 🛠 Installation and launch
 
-### 1️⃣ Подготовка БД
+### 1️⃣ Preparing the database
 
-1. Откройте PowerShell и перейдите в корень проекта:
+1. Open PowerShell and navigate to the project root:
    ```powershell
    cd E:\UVS-NET-TASK\Test
    ```
-2. Запустите скрипт развёртывания PostgreSQL в Docker:
+2. Run the PostgreSQL deployment script in Docker:
    ```powershell
    .\setUpDatabase.ps1
    ```
-   - Контейнер будет доступен на порту **7777** → **5432**
-   - Схема и таблица `employees` создаются из `dbSchema.sql`.
+  - The container will be available on port **7777** → **5432**
+  - The `employees` schema and table are created from `dbSchema.sql`.
 
-### 2️⃣ Конфигурация
+### 2️⃣ Configuration
 
-По умолчанию строка подключения хранится в **appsettings.json**:
+By default, the connection string is stored in **appsettings.json**:
 
 ```json
-"ConnectionStrings": {
-  "Default": "Host=localhost;Port=7777;Database=uvsproject;Username=postgres;Password=guest"
+{
+  "UvsTaskPassword": "guest",
+  "UvsTaskDatabase": "uvsproject",
+  "UvsTaskPort": "7777",
+  "UvsTaskSchemaLocation": "dbSchems/dbSchema.sql",
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=7777;Database=uvsproject;Username=postgres;Password=guest"
+  }
 }
 ```
 
-При необходимости измените параметры:
+Change the parameters if necessary:
 
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` в `setUpDatabase.ps1`
-- Строку подключения в `appsettings.json`
+- Connection string in `appsettings.json`
 
-### 3️⃣ Запуск приложения
+### 3️⃣ Launch the application
 
-Перейдите в папку с проектом и выполните команды:
+Go to the project folder and run the commands:
 
-- **Инициализация БД** (альтернатива PowerShell):
+- **Database initialization** (PowerShell alternative):
   ```bash
   dotnet run -- init-db
   ```
-- **Добавление сотрудника**:
+- **Adding an employee**:
   ```bash
   dotnet run -- set-employee --employeeId 5 --employeeName Steve --employeeSalary 1234
   ```
-- **Получение сотрудника**:
+- **Receiving an employee**:
   ```bash
   dotnet run -- get-employee --employeeId 5
   ```
 
 ---
 
-## 🎛 Доступные команды
+## 🎛 Available commands
 
-| Команда        | Описание                             | Параметры                                                                 |
-| -------------- | ------------------------------------ | ------------------------------------------------------------------------- |
-| `init-db`      | Инициализация БД и накатывание схемы | —                                                                         |
-| `set-employee` | Добавление/обновление сотрудника     | `--employeeId` (int)`--employeeName` (string)`--employeeSalary` (decimal) |
-| `get-employee` | Получение данных сотрудника по ID    | `--employeeId` (int)                                                      |
+| Team           | Description                                          | Parameters                                                                |
+| -------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| `init-db`      | Initializing the database and rolling out the schema | —                                                                         |
+| `set-employee` | Add/Update Employee                                  | `--employeeId` (int)`--employeeName` (string)`--employeeSalary` (decimal) |
+| `get-employee` | Getting employee data by ID                          | `--employeeId` (int)                                                      |
 
 ---
 
 ## ✅ Выполнено
 
-- Поднятие Docker-контейнера PostgreSQL и накатывание схемы через `setUpDatabase.ps1`
-- Консольное приложение на **.NET 6** с **Entity Framework Core** и **Npgsql**
-- Команды `` и `` через **System.CommandLine**
-- Команда `` для инициализации базы из приложения
-- Автоматическая проверка через `verifySubmission.ps1`
-
----
-
-## 📝 Лицензия
-
-Проект лицензирован под лицензией **MIT**.\
-См. файл [LICENSE](LICENSE).
+- Booting up a PostgreSQL Docker container and rolling out the schema via `setUpDatabase.ps1`
+- Console application on **.NET 6** with **Entity Framework Core** and **Npgsql**
+- `` and `` commands via **System.CommandLine**
+- Command `` to initialize the database from the application
+- Automatic verification via `verifySubmission.ps1`
 
