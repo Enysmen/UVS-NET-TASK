@@ -126,7 +126,7 @@ Go to the project folder and run the commands:
 
 ---
 
-## ✅ Выполнено
+## ✅ Completed
 
 - Booting up a PostgreSQL Docker container and rolling out the schema via `setUpDatabase.ps1`
 - Console application on **.NET 6** with **Entity Framework Core** and **Npgsql**
