@@ -18,7 +18,7 @@ namespace DatabaseSchema.Infrastructure
 
         public DatabaseInitializer(IConfiguration config, ILogger<DatabaseInitializer> logger)
         {
-            // берём переменные из appsettings.json или окружения
+            
             _password = config["UvsTaskPassword"] ?? throw new InvalidOperationException("Missing UvsTaskPassword");
             _database = config["UvsTaskDatabase"] ?? throw new InvalidOperationException("Missing UvsTaskDatabase");
             _port = config["UvsTaskPort"] ?? throw new InvalidOperationException("Missing UvsTaskPort");
@@ -96,19 +96,17 @@ namespace DatabaseSchema.Infrastructure
 
         private async Task ImportSchemaAsync(CancellationToken ct)
         {
-            // Вычисляем папку, где лежит сборка (и скрипт)
+            
             var baseDir = AppContext.BaseDirectory;
-
-            // Формируем путь к скрипту в выходной директории
             var schemaPath = Path.Combine(baseDir, "dbSchema.sql");
 
             if (!File.Exists(schemaPath))
+            {
                 throw new FileNotFoundException($"Schema file not found: {schemaPath}");
+            }
 
-            // Читаем и выполняем SQL
             var sql = await File.ReadAllTextAsync(schemaPath, ct);
-            await using var cn = new NpgsqlConnection(
-                $"Host=localhost;Port={_port};Username=postgres;Password={_password};Database={_database};");
+            await using var cn = new NpgsqlConnection( $"Host=localhost;Port={_port};Username=postgres;Password={_password};Database={_database};");
             await cn.OpenAsync(ct);
             await using var cmd = cn.CreateCommand();
             cmd.CommandText = sql;
