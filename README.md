@@ -18,229 +18,106 @@ C#
  * powershell
 
 
-// Proposed project structure:
+# UVS‑NET‑TASK
 
-// Solution: EmployeeApp.sln
-// - src
-//   - EmployeeApp.Console
-//     - Program.cs
-//     - Commands
-//       - SetEmployeeCommand.cs
-//       - GetEmployeeCommand.cs
-//   - EmployeeApp.Core
-//     - Models
-//       - Employee.cs
-//     - Services
-//       - IEmployeeService.cs
-//       - EmployeeService.cs
-//   - EmployeeApp.Data
-//     - EmployeeContext.cs
-//     - Repositories
-//       - IEmployeeRepository.cs
-//       - EmployeeRepository.cs
-// - tests
-//   - EmployeeApp.Tests
-//     - Services
-//       - EmployeeServiceTests.cs
-//     - Repositories
-//       - EmployeeRepositoryTests.cs
+&#x20;
 
-// =======================
-// EmployeeApp.Core/Models/Employee.cs
-namespace EmployeeApp.Core.Models;
+Консольное приложение на **.NET 6** для управления данными сотрудников (добавление и получение) в базе данных PostgreSQL с использованием **Entity Framework Core**.
 
-public class Employee
-{
-public int Id { get; set; }
-public string Name { get; set; } = null!;
-public decimal Salary { get; set; }
+---
+
+## 📋 Оглавление
+
+- [🚀 Требования](#-требования)
+- [🛠 Установка и запуск](#-установка-и-запуск)
+  - [1️⃣ Подготовка БД](#1️⃣-подготовка-бд)
+  - [2️⃣ Конфигурация](#2️⃣-конфигурация)
+  - [3️⃣ Запуск приложения](#3️⃣-запуск-приложения)
+- [🎛 Доступные команды](#-доступные-команды)
+- [✅ Выполнено](#-выполнено)
+- [📝 Лицензия](#-лицензия)
+
+---
+
+## 🚀 Требования
+
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
+- [Docker](https://www.docker.com/) (для PostgreSQL) или локальный инстанс PostgreSQL
+- PowerShell Core или Windows PowerShell
+
+---
+
+## 🛠 Установка и запуск
+
+### 1️⃣ Подготовка БД
+
+1. Откройте PowerShell и перейдите в корень проекта:
+   ```powershell
+   cd E:\UVS-NET-TASK\Test
+   ```
+2. Запустите скрипт развёртывания PostgreSQL в Docker:
+   ```powershell
+   .\setUpDatabase.ps1
+   ```
+   - Контейнер будет доступен на порту **7777** → **5432**
+   - Схема и таблица `employees` создаются из `dbSchema.sql`.
+
+### 2️⃣ Конфигурация
+
+По умолчанию строка подключения хранится в **appsettings.json**:
+
+```json
+"ConnectionStrings": {
+  "Default": "Host=localhost;Port=7777;Database=uvsproject;Username=postgres;Password=guest"
 }
+```
 
-// =======================
-// EmployeeApp.Data/EmployeeContext.cs
-using EmployeeApp.Core.Models;
-using Microsoft.EntityFrameworkCore;
+При необходимости измените параметры:
 
-namespace EmployeeApp.Data;
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` в `setUpDatabase.ps1`
+- Строку подключения в `appsettings.json`
 
-public class EmployeeContext : DbContext
-{
-public EmployeeContext(DbContextOptions options)
-: base(options) { }
+### 3️⃣ Запуск приложения
 
-public DbSet<Employee> Employees { get; set; } = null!;
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-    modelBuilder.Entity<Employee>(eb =>
-    {
-        eb.ToTable("employees");
-        eb.HasKey(e => e.Id);
-        eb.Property(e => e.Name).HasColumnName("employeename").IsRequired().HasMaxLength(128);
-        eb.Property(e => e.Salary).HasColumnName("employeesalary");
-    });
-}
+Перейдите в папку с проектом и выполните команды:
 
-}
+- **Инициализация БД** (альтернатива PowerShell):
+  ```bash
+  dotnet run -- init-db
+  ```
+- **Добавление сотрудника**:
+  ```bash
+  dotnet run -- set-employee --employeeId 5 --employeeName Steve --employeeSalary 1234
+  ```
+- **Получение сотрудника**:
+  ```bash
+  dotnet run -- get-employee --employeeId 5
+  ```
 
-// =======================
-// EmployeeApp.Data/Repositories/IEmployeeRepository.cs
-using EmployeeApp.Core.Models;
+---
 
-namespace EmployeeApp.Data.Repositories;
+## 🎛 Доступные команды
 
-public interface IEmployeeRepository
-{
-Task AddAsync(Employee employee, CancellationToken ct = default);
-Task<Employee?> GetAsync(int id, CancellationToken ct = default);
-}
+| Команда        | Описание                             | Параметры                                                                 |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------- |
+| `init-db`      | Инициализация БД и накатывание схемы | —                                                                         |
+| `set-employee` | Добавление/обновление сотрудника     | `--employeeId` (int)`--employeeName` (string)`--employeeSalary` (decimal) |
+| `get-employee` | Получение данных сотрудника по ID    | `--employeeId` (int)                                                      |
 
-// =======================
-// EmployeeApp.Data/Repositories/EmployeeRepository.cs
-using EmployeeApp.Core.Models;
-using Microsoft.EntityFrameworkCore;
+---
 
-namespace EmployeeApp.Data.Repositories;
+## ✅ Выполнено
 
-public class EmployeeRepository : IEmployeeRepository
-{
-private readonly EmployeeContext _context;
-public EmployeeRepository(EmployeeContext context) => _context = context;
+- Поднятие Docker-контейнера PostgreSQL и накатывание схемы через `setUpDatabase.ps1`
+- Консольное приложение на **.NET 6** с **Entity Framework Core** и **Npgsql**
+- Команды `` и `` через **System.CommandLine**
+- Команда `` для инициализации базы из приложения
+- Автоматическая проверка через `verifySubmission.ps1`
 
-public async Task AddAsync(Employee employee, CancellationToken ct = default)
-{
-    await _context.Employees.AddAsync(employee, ct);
-    await _context.SaveChangesAsync(ct);
-}
+---
 
-public async Task<Employee?> GetAsync(int id, CancellationToken ct = default)
-    => await _context.Employees.FindAsync(new object[] { id }, ct);
+## 📝 Лицензия
 
-}
+Проект лицензирован под лицензией **MIT**.\
+См. файл [LICENSE](LICENSE).
 
-// =======================
-// EmployeeApp.Core/Services/IEmployeeService.cs
-using EmployeeApp.Core.Models;
-
-namespace EmployeeApp.Core.Services;
-
-public interface IEmployeeService
-{
-Task AddEmployeeAsync(int id, string name, decimal salary, CancellationToken ct = default);
-Task<Employee?> GetEmployeeAsync(int id, CancellationToken ct = default);
-}
-
-// =======================
-// EmployeeApp.Core/Services/EmployeeService.cs
-using EmployeeApp.Core.Models;
-using EmployeeApp.Data.Repositories;
-
-namespace EmployeeApp.Core.Services;
-
-public class EmployeeService : IEmployeeService
-{
-private readonly IEmployeeRepository _repo;
-public EmployeeService(IEmployeeRepository repo) => _repo = repo;
-
-public async Task AddEmployeeAsync(int id, string name, decimal salary, CancellationToken ct = default)
-{
-    var employee = new Employee { Id = id, Name = name, Salary = salary };
-    await _repo.AddAsync(employee, ct);
-}
-
-public async Task<Employee?> GetEmployeeAsync(int id, CancellationToken ct = default)
-    => await _repo.GetAsync(id, ct);
-
-}
-
-// =======================
-// EmployeeApp.Console/Commands/SetEmployeeCommand.cs
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using EmployeeApp.Core.Services;
-
-namespace EmployeeApp.Console.Commands;
-
-public static class SetEmployeeCommand
-{
-public static Command Create(IEmployeeService svc)
-{
-var cmd = new Command("set-employee", "Add a new employee")
-{
-new Option("--employeeId", "Employee ID") { IsRequired = true },
-new Option("--employeeName", "Employee name") { IsRequired = true },
-new Option("--employeeSalary", "Employee salary") { IsRequired = true }
-};
-
-    cmd.Handler = CommandHandler.Create<int, string, decimal>(
-        async (employeeId, employeeName, employeeSalary) =>
-        {
-            await svc.AddEmployeeAsync(employeeId, employeeName, employeeSalary);
-            Console.WriteLine("Employee added.");
-        });
-
-    return cmd;
-}
-
-}
-
-// =======================
-// EmployeeApp.Console/Commands/GetEmployeeCommand.cs
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using EmployeeApp.Core.Services;
-
-namespace EmployeeApp.Console.Commands;
-
-public static class GetEmployeeCommand
-{
-public static Command Create(IEmployeeService svc)
-{
-var cmd = new Command("get-employee", "Retrieve employee by ID")
-{
-new Option("--employeeId", "Employee ID") { IsRequired = true }
-};
-
-    cmd.Handler = CommandHandler.Create<int>(
-        async (employeeId) =>
-        {
-            var emp = await svc.GetEmployeeAsync(employeeId);
-            if (emp is null)
-                Console.WriteLine("Employee not found.");
-            else
-                Console.WriteLine($"Id={emp.Id}, Name={emp.Name}, Salary={emp.Salary}");
-        });
-
-    return cmd;
-}
-
-}
-
-// =======================
-// EmployeeApp.Console/Program.cs
-using System.CommandLine;
-using EmployeeApp.Console.Commands;
-using EmployeeApp.Core.Services;
-using EmployeeApp.Data;
-using EmployeeApp.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-var host = Host.CreateDefaultBuilder()
-.ConfigureServices((context, services) =>
-{
-services.AddDbContext(opts =>
-opts.UseNpgsql(context.Configuration.GetConnectionString("Default")));
-services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-services.AddScoped<IEmployeeService, EmployeeService>();
-})
-.Build();
-
-var svc = host.Services.GetRequiredService();
-
-// Root command
-var root = new RootCommand("Employee Management CLI");
-root.AddCommand(SetEmployeeCommand.Create(svc));
-root.AddCommand(GetEmployeeCommand.Create(svc));
-
-return await root.InvokeAsync(args);
