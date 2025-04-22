@@ -93,7 +93,7 @@ Go to the project folder and run the commands:
   ```
   There are two options for starting a database: one is to run the script "setUpDatabase.ps1" where the database will be created, and the other is to run a Docker container.
   
--**Another way to start:
+- **Another way to start**:
 ```bash
   docker run -d `
   --name uvs-postgres `
