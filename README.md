@@ -91,6 +91,20 @@ Go to the project folder and run the commands:
   ```bash
   dotnet run -- init-db
   ```
+  There are two options for starting a database: one is to run the script "setUpDatabase.ps1" where the database will be created, and the other is to run a Docker container.
+  
+-**Another way to start:
+```bash
+  docker run -d `
+  --name uvs-postgres `
+  -e POSTGRES_USER=postgres `
+  -e POSTGRES_PASSWORD=guest `
+  -e POSTGRES_DB=uvsproject `
+  -p 7777:5432 `
+   postgres:latest
+  ```
+We raise the Docker container and then enter the command "dotnet run -- init-db" and then we specify further commands.
+  
 - **Adding an employee**:
   ```bash
   dotnet run -- set-employee --employeeId 5 --employeeName Steve --employeeSalary 1234
