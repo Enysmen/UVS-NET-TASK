@@ -22,7 +22,14 @@ namespace DatabaseSchema.DataBaseContext
         public DbSet<Employee> Employees { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-          => optionsBuilder.UseNpgsql("Host=localhost;Port=7777;Database=uvsproject;Username=postgres;Password=guest");
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("Host=localhost;Port=7777;Database=uvsproject;Username=postgres;Password=guest");
+            }
+        }
+
+        
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
